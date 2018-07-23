@@ -1,0 +1,22 @@
+html {
+    height: 100%;
+    position: relative;
+    font-size: 125%;
+  }
+  
+  body {
+    font-family: 'PingFangSC-Thin', 'PingFang SC Thin', 'PingFang SC', '微软雅黑', 'Microsoft YaHei', '宋体', Tahoma, Helvetica, Arial, sans-serif;
+    font-size: .7rem;
+    line-height: 1.5;
+    // background-color:  
+    >.container {
+      padding: 3rem .75rem 0;
+    }
+    height: inherit;
+    margin: 0;
+    min-width: 860px;
+  }
+
+  .el-loading-mask {
+    position: fixed;
+  }

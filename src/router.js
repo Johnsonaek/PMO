@@ -1,21 +1,27 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
-import About from './views/About.vue'
+import views from './views'
+
 
 Vue.use(Router)
 
 export default new Router({
+ // mode: 'history',
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home
+      name: 'index',
+      redirect: 'home',
     },
     {
-      path: '/about',
-      name: 'about',
-      component: About
+      path: '/home',
+      name: 'home',
+      component: views.Home,
+    },
+    {
+      path: '/addpage',
+      name: 'add',
+      component: views.Add,
     }
   ]
 })

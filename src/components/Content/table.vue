@@ -1,0 +1,443 @@
+/* eslint-disabled */
+<template>
+  <div class="table">
+        <el-table 
+                border
+                stripe
+                :data="tables"
+                style="width: 100%"
+                max-height=760
+                :default-sort="{prop: 'startTime', order: 'descending'}"
+                >
+            <!-- 地址 -->
+                <el-table-column label="项目通称"   header-align="center"  fixed  width="200">
+                   
+                    <template slot-scope="scope" >    
+                        <span class="col-cont" v-html="showDate(scope.row.projectAlias)" ></span>
+                    </template>
+                </el-table-column>
+                <!-- 用户名 -->
+                <el-table-column label="商机编号/项目编号" header-align="center" width="150" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectId)" ></span>
+                    </template>
+                </el-table-column>
+                <!-- 地址 -->
+                <el-table-column label="合同编号" header-align="center" width="300">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.contractNo)" ></span>
+                    </template>
+                </el-table-column>
+                 <el-table-column label="合同签订时间" header-align="center" width="200">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.startTime)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="采购方式" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.purchaseType)" ></span>
+                    </template>
+                </el-table-column>   
+                <el-table-column label="工期要求" header-align="center"  width="200">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.onlineTime)" ></span>
+                    </template>
+                </el-table-column>  
+
+                <el-table-column label="项目名称" header-align="center"  width="300">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectName)" ></span>
+                    </template>
+                </el-table-column>  
+                <el-table-column label="项目类型" header-align="center"  width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectType)" ></span>
+                    </template>
+                </el-table-column>  
+
+                 <el-table-column label="项目启动时间" header-align="center" width="200" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.startTime)" ></span>
+                    </template>
+                </el-table-column>  
+                <el-table-column label="项目金额" header-align="center" width="120" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
+                    </template>
+                </el-table-column>  
+
+                 <el-table-column label="项目级别" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectLevel)" ></span>
+                    </template>
+                </el-table-column> 
+                
+                <el-table-column label="项目分类" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectClassify)" ></span>
+                    </template>
+                </el-table-column>  
+
+                 <el-table-column label="公司名称（客户）" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.customerName)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="部门名称（客户）" header-align="center" width="160" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.customerDepartmentName)" ></span>
+                    </template>
+                </el-table-column>  
+
+                 <el-table-column label="二级经理（客户）" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.lever2Manager)" ></span>
+                    </template>
+                </el-table-column>  
+
+                <el-table-column label="三级经理（客户）" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.lever3Manager)" ></span>
+                    </template>
+                </el-table-column>  
+
+                <el-table-column label="员工（客户）" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.customerStaffName)" ></span>
+                    </template>
+                </el-table-column>  
+
+                <el-table-column label="主要联系人" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.customerPrimaryContact)" ></span>
+                    </template>
+                </el-table-column>  
+
+                <el-table-column label="涉及小组" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.teams)" ></span>
+                    </template>
+                </el-table-column> 
+
+                <el-table-column label="涉及区域" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.involvedRegion)" ></span>
+                    </template>
+                </el-table-column> 
+                
+                <el-table-column label="销售经理" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.saleManager)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="区域大项目经理" header-align="center" width="160" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.areaProjectManager)" ></span>
+                    </template>
+                </el-table-column> 
+                <el-table-column label="区域解决方案经理" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.regionalSolManager)" ></span>
+                    </template>
+                </el-table-column> 
+                <el-table-column label="产品部项目经理" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectManagerId)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="实施经理" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.implementManager)" ></span>
+                    </template>
+                </el-table-column> 
+
+                <el-table-column label="研发经理" header-align="center" width="120" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.developManager)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="测试经理" header-align="center" width="120" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.testManager)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="服务经理" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.serviceManager)" ></span>
+                    </template>
+                </el-table-column> 
+
+                <el-table-column label="商务状态" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.commerceStatus)" ></span>
+                    </template>
+                </el-table-column> 
+
+                 <el-table-column label="实施依据" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.implementBases)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="实施状态" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.implementStatus)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="研发状态" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.developStatus)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="上线状态" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.onlineStatus)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="交维状态" header-align="center" width="120" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.operateStatus)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="当前进展" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.currentProgress)" ></span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="近期计划" header-align="center"  width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.recentPlan)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="进度(%) 0~100" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.progress)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="当前风险度" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.pressure)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="当前风险及应对措施" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.countermeasures)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="上月工时投入" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.lastMonthWorkTime)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="总工时投入" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.totalWorkTime)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="下一里程碑" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="计划完成时间" header-align="center" width="120" >
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.planFinishedTime)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="里程碑是否逾期" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.isOverdue)" ></span>
+                    </template>
+                </el-table-column>
+
+                 <el-table-column label="已回款比例" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.confirmedProgress)" ></span>
+                    </template>
+                </el-table-column>
+                 <el-table-column label="金融得分" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.moneyScore)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="战略意义得分" header-align="center" width="160">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
+                    </template>
+                </el-table-column>
+                
+                <el-table-column label="产品匹配度得分" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="总分" header-align="center" width="120">
+                    <template slot-scope="scope">
+                        <span class="col-cont" v-html="showDate(scope.row.totalScore)" ></span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="产品节点" header-align="center" width="150">
+                    <template slot-scope="scope">
+                        <el-button
+                              type="text"
+                              size="small">
+                              查看详情
+                            </el-button>
+                    </template>
+                </el-table-column>     
+                 <el-table-column label="操作" header-align="center"  fixed="right" width="150">
+                    <template slot-scope="scope">
+                        <el-button
+                              type="text"
+                              size="small">
+                              编辑
+                            </el-button>
+                             <el-button
+                              type="text"
+                              size="small">
+                              历史
+                            </el-button>
+                             <el-button
+                              type="text"
+                              size="small">
+                              评分
+                            </el-button>
+                    </template>
+                </el-table-column>     
+            </el-table>
+
+           
+  </div>
+</template>
+<script>
+
+import axios from 'axios';
+import Mock from "../../mock/mock";
+
+
+
+export default {
+        name: 'Body',
+       // props
+        data() {
+            return {
+                tableData: []
+            }
+        },
+        components: {
+           
+        },
+        computed: {
+        // 实时监听表格
+            tables: function() {
+                const search = this.search
+                if (search) {
+                    return this.tableData.filter(dataNews => {
+                        return Object.keys(dataNews).some(key => {
+                            return String(dataNews[key]).toLowerCase().indexOf(search) > -1
+                        })
+                    })
+                }
+                return this.tableData
+            }
+        },
+		
+        mounted: function(){
+        axios.get('/table/list').then(res=>{
+             this.tableData = res.data.articles;
+             console.log(res.data.articles);
+         })
+        },
+        methods: {
+            // 筛选变色
+            showDate(val) {
+                val = val + '';
+                if (val.indexOf(this.search) !== -1 && this.search !== '') {
+                    return val.replace(this.search, '<font color="#409EFF">' + this.search + '</font>')
+                } else {
+                    return val
+                }
+            },
+			      addPage: function () {
+                        this.$router.push({ path: '/addpage'});
+						},
+                          
+                        handleClick(row) {
+                      console.log(row);
+                        },
+                        filterHandler(value, row, column) {
+        const property = column['property'];
+        return row[property] === value;
+      }
+                   
+        }
+     }
+
+
+</script>
+<style scoped lang="scss">
+.table {
+   width: 1366px;
+   height: 768px;
+   min-width: 1366px;
+   min-height: 768px;
+   margin: 0 auto;
+   text-align: center;
+}
+.info{
+  position: relative;
+  height: 100px;
+}
+#search{
+   position: absolute;
+   height:auto;
+   right:82px;
+   top:0;
+}
+.title{
+            width: 173px;
+            /* height: 23px; */
+            position: relative;
+            top: 21px;
+            left: 28px;
+            font-size: 20px;
+            font-family: "Microsoft YaHei";
+
+}
+ .search{
+         position: relative;
+
+ }
+ .btn{
+         position: absolute;
+        top: -1px;
+        left: 398px;
+ }
+ el-tab td {
+     padding: 5px 0 !important;
+ }
+ 
+</style>
+
+
