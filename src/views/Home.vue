@@ -11,17 +11,19 @@
          </div>
       </div>
     <div class="htab">
-      <div class="left">
+     <!-- <div class="left">
     <Htab></Htab>
-    </div>
+    </div>-->
     <div class="right" style="text-align: right; margin-right: 60px">自定义显示</div>
     </div>
-    <div class="hlabel">
+    <!--<div class="hlabel">
     <Hlabel></Hlabel>
-    </div>
-    <Table></Table>
+    </div>-->
+    <!--<pTable></pTable>-->
+   <Table></Table>
+   <Pagination></Pagination>
     <router-view/>
-    <Fpagination></Fpagination>
+ 
     <Footer></Footer>
   </div>
 </template>
@@ -29,19 +31,20 @@
 <script>
 // @ is an alias to /src
 import Htab from '@/components/Content/htab.vue'
-import Hlabel from '@/components/Content/hlabel.vue'
+//import Hlabel from '@/components/Content/hlabel.vue'
 import Table from '@/components/Content/table.vue'
-import Fpagination from '@/components/Content/fpagination.vue'
+import Pagination from '@/components/Content/fpagination.vue'
 import Footer from '@/components/footer.vue'
-
+//import pTable from '@/components/Content/ptable.vue'
 
 export default {
   name: 'home',
   components: {
     Htab,
-    Hlabel,
+  //  Hlabel,
+   // pTable,
     Table,
-    Fpagination,
+    Pagination,
     Footer
   },
   methods: {
@@ -51,7 +54,7 @@ export default {
   },
   computed: {
         // 实时监听表格
-            tables: function() {
+        /*    tables: function() {
                 const search = this.search
                 if (search) {
                     return this.tableData.filter(dataNews => {
@@ -61,9 +64,12 @@ export default {
                     })
                 }
                 return this.tableData
-            }
+            }*/
         }
-}
+
+       
+ }
+
 
 </script>
 
