@@ -40,7 +40,7 @@ function getData(){
          "mailstoneName":"",
          "moneyScore":16.4,
          "nodeCount":"0",
-         "onlineStatus|1":["已立项","未开始","已交付","已运行"],
+         "onlineStatus|1":["已立项","未开始","已结项","已运行"],
          "onlineTime":"2016-12-31 00:00:00",
          "operateStatus":"自运维",
          "planFinishedTime":"",
@@ -65,13 +65,14 @@ function getData(){
          "risk|1":["高","中","极高","危险"],
          "saleManager":Mock.Random.cname(),
          "serviceManager":Mock.Random.cname(),
-         "signContractTime":"2015-09-21 00:00:00",
-         "startTime":"2015-09-21 00:00:00",
+         "signContractTime|1":["2015-09-21 00:00:00", "2016-09-21 00:00:00", "2017-09-21 00:00:00"],
+         "startTime|1":["2015-09-21 00:00:00", "2016-09-21 00:00:00", "2017-09-21 00:00:00"],
          "teams|1":["I3", "方案1组", "SE", "移动应用组", "DA", "CD", "平台组"],
          "testManager":Mock.Random.cname(),
          "totalScore":Mock.Random.cname(),
          "totalWorkTime":"",
-         "updateTime":"2018-07-12 00:00:00"
+         "updateTime":"2018-07-12 00:00:00",
+         "state":"true"
         }))
 
      //   articles.push(newArticleObject)

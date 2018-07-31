@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-     <div class="info" style="height: 100px">
+     <div class="info" style="height: 80px">
          <div class="title">生产调度-项目清单</div>
          <div id="search" style="margin-top: 15px; width:400px;">
            <!--<el-input type="search" v-model="search" placeholder="项目编号/商机编号/项目名称/项目经理" >
@@ -10,16 +10,6 @@
            <el-button type="primary" icon="el-icon-plus" class="btn" @click="addPage"></el-button>
          </div>
       </div>
-    <div class="htab">
-     <!-- <div class="left">
-    <Htab></Htab>
-    </div>-->
-    <div class="right" style="text-align: right; margin-right: 60px">自定义显示</div>
-    </div>
-    <!--<div class="hlabel">
-    <Hlabel></Hlabel>
-    </div>-->
-    <!--<pTable></pTable>-->
    <Table></Table>
    <Pagination></Pagination>
     <router-view/>

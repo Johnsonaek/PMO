@@ -1,340 +1,56 @@
 /* eslint-disabled */
 <template>
-  <div class="table">
-        <el-table 
+ <div class="content">
+    <div class="content-header">
+      <div align="left" class="content-header-left">
+         <Tab @changeRadio="getRadioValue"></Tab>
+      </div>
+      
+      <div align="right" class="content-header-right">
+       <span class="h-font" @click="customize">
+          <i class="iconfont el-icon-setting"></i>自定义显示
+        </span> 
+      </div>
+    
+       <div class="h-tags">
+      <filterBox :tagArr="tags" @deleteTag="deleteTagFilter"></filterBox>
+       </div>
+       </div>
+       <div class="table">
+       <el-table
                 border
                 stripe
-                :data="tableData1"
+                ref="mytable"
+                fit
+                @filter-change="handleFilterChange"
+                :data="tempData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize)"
                 style="width: 100%"
-                max-height=700
-                :default-sort="{prop: 'startTime', order: 'descending'}"
+                max-height=640
+                class="self-table"
+                :default-sort="{prop:'startTime',order: 'descending'}"
                 >
-            <!-- 地址 -->
-                <el-table-column label="项目通称"   header-align="center"  fixed  width="200">
-                   
-                    <template slot-scope="scope" >    
-                        <span class="col-cont" v-html="showDate(scope.row.projectAlias)" ></span>
-                    </template>
-                </el-table-column>
-                <!-- 用户名 -->
-                <el-table-column label="商机编号/项目编号" header-align="center" width="150" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectId)" ></span>
-                    </template>
-                </el-table-column>
-                <!-- 地址 -->
-                <el-table-column label="合同编号" header-align="center" width="300">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.contractNo)" ></span>
-                    </template>
-                </el-table-column>
-                 <el-table-column 
-                  prop="startTime" 
-                label="合同签订时间" 
-                sortable 
-                header-align="center" 
-                width="160"
-                 >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.startTime)" ></span>
-                    </template>
-                </el-table-column>
+          <el-table-column
+            header-align="center"
+            v-for="(column, index) in columnAll" 
+            :key="index"
+            :prop="column.prop"
+            :label="column.label"
+            :width="column.width"
+            :render-header="column.render"
+            :fixed="column.fixed"
+            :sortable="column.sortable"
+            :column-key="column.columnKey"
+            :filters="column.filters"
+            :filter-method="filterHandler"
+          >
+          <template slot-scope="scope">
+           <span>
+            {{scope.row[column.prop]}}
+           </span>
+          </template>
+           </el-table-column>
 
-                <el-table-column 
-                prop="purchaseType" 
-                  label="采购方式" 
-                  header-align="center"
-                   width="120" 
-                   :filters="[{text: '单一来源', value: '单一来源'}, {text: '公开招标', value: '公开招标'}, {text: '比选', value: '比选'}, {text: '框架协议', value: '框架协议'}]" 
-                   :filter-method="filterHandler"
-                >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.purchaseType)" ></span>
-                    </template>
-                </el-table-column>   
-                <el-table-column label="工期要求" header-align="center"  width="200">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.onlineTime)" ></span>
-                    </template>
-                </el-table-column>  
-
-                <el-table-column label="项目名称" header-align="center"  width="300">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectName)" ></span>
-                    </template>
-                </el-table-column>  
-                <el-table-column label="项目类型" header-align="center"  width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectType)" ></span>
-                    </template>
-                </el-table-column>  
-
-                 <el-table-column label="项目启动时间" header-align="center" width="200" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.startTime)" ></span>
-                    </template>
-                </el-table-column>  
-                <el-table-column label="项目金额" header-align="center" width="120" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
-                    </template>
-                </el-table-column>  
-
-                 <el-table-column 
-                  prop="projectLevel"
-                label="项目级别" 
-                header-align="center" 
-                width="120" 
-                :filters="[{text: '重大', value: '重大'}, {text: '重点', value: '重点'}, {text: '一般', value: '一般'}]" 
-                :filter-method="filterHandler">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectLevel)" ></span>
-                    </template>
-                </el-table-column> 
-                
-                <el-table-column 
-                prop="projectClassify"
-                label="项目分类" 
-                header-align="center" 
-                width="120" 
-                :filters="[{text: '平台类', value: '平台类'}, {text: '应用类', value: '应用类'}, {text: '运营类', value: '运营类'}, {text: '咨询类', value: '咨询类'}, {text: '分析类', value: '分析类'}]" 
-                :filter-method="filterHandler">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectClassify)" ></span>
-                    </template>
-                </el-table-column>  
-
-                 <el-table-column label="公司名称（客户）" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.customerName)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="部门名称（客户）" header-align="center" width="160" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.customerDepartmentName)" ></span>
-                    </template>
-                </el-table-column>  
-
-                 <el-table-column label="二级经理（客户）" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.lever2Manager)" ></span>
-                    </template>
-                </el-table-column>  
-
-                <el-table-column label="三级经理（客户）" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.lever3Manager)" ></span>
-                    </template>
-                </el-table-column>  
-
-                <el-table-column label="员工（客户）" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.customerStaffName)" ></span>
-                    </template>
-                </el-table-column>  
-
-                <el-table-column label="主要联系人" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.customerPrimaryContact)" ></span>
-                    </template>
-                </el-table-column>  
-
-                <el-table-column 
-                 prop="teams" 
-                label="涉及小组" 
-                header-align="center" 
-                width="120" 
-                :filters="[{text: 'I3', value: 'I3'},{text: '方案1组', value: '方案1组'},{text: 'SE', value: 'SE'}, {text: '移动应用组', value: '移动应用组'}, {text: 'DA', value: 'DA'}, {text: 'CD', value: 'CD'}, {text: '平台组', value: '平台组'}]"
-                :filter-method="filterHandler">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.teams)" ></span>
-                    </template>
-                </el-table-column> 
-
-                <el-table-column 
-                prop="involvedRegion"
-                label="涉及区域" 
-                header-align="center" 
-                width="120" 
-                :filters="[{text: '北支', value: '北支'}, {text: '上支', value: '上支'}, {text: '成支', value: '成支'}, {text: '广支', value: '广支'}]" 
-                :filter-method="filterHandler">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.involvedRegion)" ></span>
-                    </template>
-                </el-table-column> 
-                
-                <el-table-column label="销售经理" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.saleManager)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="区域大项目经理" header-align="center" width="160" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.areaProjectManager)" ></span>
-                    </template>
-                </el-table-column> 
-                <el-table-column label="区域解决方案经理" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.regionalSolManager)" ></span>
-                    </template>
-                </el-table-column> 
-                <el-table-column label="产品部项目经理" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectManagerId)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="实施经理" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.implementManager)" ></span>
-                    </template>
-                </el-table-column> 
-
-                <el-table-column label="研发经理" header-align="center" width="120" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.developManager)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="测试经理" header-align="center" width="120" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.testManager)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="服务经理" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.serviceManager)" ></span>
-                    </template>
-                </el-table-column> 
-
-                <el-table-column label="商务状态" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.commerceStatus)" ></span>
-                    </template>
-                </el-table-column> 
-
-                 <el-table-column label="实施依据" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.implementBases)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="实施状态" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.implementStatus)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="研发状态" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.developStatus)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="上线状态" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.onlineStatus)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="交维状态" header-align="center" width="120" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.operateStatus)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="当前进展" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.currentProgress)" ></span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="近期计划" header-align="center"  width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.recentPlan)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="进度(%) 0~100" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.progress)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="当前风险度" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.pressure)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="当前风险及应对措施" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.countermeasures)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="上月工时投入" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.lastMonthWorkTime)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="总工时投入" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.totalWorkTime)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="下一里程碑" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="计划完成时间" header-align="center" width="120" >
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.planFinishedTime)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="里程碑是否逾期" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.isOverdue)" ></span>
-                    </template>
-                </el-table-column>
-
-                 <el-table-column label="已回款比例" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.confirmedProgress)" ></span>
-                    </template>
-                </el-table-column>
-                 <el-table-column label="金融得分" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.moneyScore)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="战略意义得分" header-align="center" width="160">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
-                    </template>
-                </el-table-column>
-                
-                <el-table-column label="产品匹配度得分" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.projectPrice)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="总分" header-align="center" width="120">
-                    <template slot-scope="scope">
-                        <span class="col-cont" v-html="showDate(scope.row.totalScore)" ></span>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="产品节点" header-align="center" width="150">
+            <el-table-column label="产品节点" header-align="center" width="150">
                     <template slot-scope="scope">
                         <el-button
                               type="text"
@@ -343,151 +59,677 @@
                             </el-button>
                     </template>
                 </el-table-column>     
-                 <el-table-column label="操作" header-align="center"  fixed="right" width="150">
+                 <el-table-column 
+                 label="操作" 
+                 header-align="center"  
+                 fixed="right" 
+                 width="150"
+                 prop="state"
+                 >
                     <template slot-scope="scope">
                         <el-button
                               type="text"
-                              size="small">
+                              size="small"
+                              @click="showDetail(scope.$index, scope.row)"
+                              >
                               详情
                             </el-button>
                              <el-button
                               type="text"
-                              size="small">
+                              size="small"
+                              @click="handleScore(scope.$index, scope.row)">
                               评分
                             </el-button>
                              <el-button
                               type="text"
-                              size="small">
-                              关注
+                              size="small"
+                              @click="handleQuit(scope.$index, scope.row)">
+                              {{scope.row.state ? '关注': '取消'}}
                             </el-button>
                     </template>
                 </el-table-column>     
-            </el-table>
-<Pagination
-@handleSizeChange="getSize"
-@handleCurrentChange="getCurrent" 
-:current-page="currentPage"
-:page-size="pagesize"
-:total='total'
->
-</Pagination>         
-  </div>
+           </el-table>
+           </div>
+           <Pagination
+              @handleSizeChange="getPageSize"
+              @handleCurrentChange="getCurrentPage" 
+              
+              :total='total'
+            >
+            </Pagination>
+
+            <el-dialog 
+            :visible.sync="detailVisible" :modal="true" width="800px">
+          <h2 slot="title">详情</h2>
+          <detail ref="newOrderDetail" :newOrderDetail="newOrderDetail"></detail>
+          <!--<div slot="footer" class="detail-wrap-bottom">
+            <el-button type="text">确认</el-button>
+            <el-button type="text">退回</el-button>
+          </div>-->
+        </el-dialog> 
+
+        <customSetting 
+          v-if="customVisible" 
+          @changeUserStatus="changeStatus" 
+          :defaultKeys="['projectAlias','contractNo','signContractTime','purchaseType']">
+        </customSetting >        
+          </div>
 </template>
 <script>
 
 import axios from 'axios';
 import mock from '../../mock/mock.js';
 import Pagination from '@/components/Content/fpagination.vue';
-
-
+import expand from '@/components/Content/expand.vue';
+import Tab from '@/components/Content/htab.vue';
+import detail from '@/components/Content/detail.vue';
+import filterBox from './filteredbox.vue';
+import customSetting from './customsetting.vue';
+import moment from 'moment'
 export default {
-        //name: 'Body',
-       // props: ['total', 'pagesize', 'currentPage'],
         data() {
             return {
                 tableData: [],
+                tempData: [],
+                listData: [],
                 total: 0,
                 pagesize: 10,
                 currentPage: 1,
                 pageCount: 0,
-                radio3: '全部'
+                radio: 'all',
+                columnAll: [
+                    {
+                      fixed: 'left',
+                      prop: 'projectAlias',
+                      label: '项目通称',
+                      width: 160,
+                    },
+                    {
+                      prop: 'projectId',
+                      label: '商机编号/项目编号',
+                      width: 120  
+                    },{
+                      prop: 'contractNo',
+                      label: '合同编号',
+                      width: 160  
+                    },{
+                      sortable: 'true',
+                      prop: 'startTime',
+                      label: '合同签订时间',
+                      width: 160 ,
+                      render: (h, {column, $index }) => {
+                          return (
+                             <div class="sort-table-header-wrapper">
+                                <span style="float: left">{column.label}</span>
+                                <span class="caret-wrapper">
+                                  <i class="sort-caret ascending"></i>
+                                  <i class="sort-caret descending"></i>
+                                </span>
+                                <span class="el-table_column-filter-trigger" on-click={() => this.timefilter(column)}>
+                                 <el-date-picker
+                                 type="daterange"
+                                 picker-options={this.pickerOptions2}
+                                style="width: 1px; border: none">
+                                </el-date-picker>
+                               </span>
+                            </div>
+                          ) 
+                      }
+
+                    },{
+                      prop: 'purchaseType',
+                      label: '采购方式',
+                      width: 120,
+                      columnKey: 'purchaseType',
+                      filters: [
+                        {
+                          text: '单一来源', 
+                          value: '单一来源'
+                        }, {
+                          text: '公开招标', 
+                          value: '公开招标'
+                        }, {
+                          text: '比选', 
+                          value: '比选'
+                        }, {
+                          text: '框架协议', 
+                          value: '框架协议'
+                        }]  
+                    },{
+                      prop: 'onlineTime',
+                      label: '工期要求',
+                      width: 160,
+                      render: (h, {column, $index }) => {
+                          return (
+                             <div class="sort-table-header-wrapper">
+                             <span style="float: left">{column.label}</span>
+                                <span class="el-table_column-filter-trigger" on-click={() => this.timefilter(column)}>
+                                 <el-date-picker
+                                 type="daterange"
+                                 picker-options={this.pickerOptions2}
+                                style="width: 1px; border: none">
+                                </el-date-picker>
+                               </span>
+                            </div>
+                          ) 
+                      }  
+                    },{
+                      prop: 'projectName',
+                      label: '项目名称',
+                      width: 160  
+                    },{
+                      prop: 'projectType',
+                      label: '项目类型',
+                      width: 120  
+                    },{
+                      prop: 'startTime',
+                      label: '项目启动时间',
+                      width: 160  
+                    },{
+                      prop: 'projectPrice',
+                      label: '项目金额',
+                      width: 120  
+                    },{
+                      prop: 'projectLevel',
+                      label: '项目级别',
+                      width: 120 ,
+                      filters: [
+                        {
+                          text: '重大',
+                          value: '重大'
+                        }, {
+                          text: '重点', 
+                          value: '重点'
+                        }, {
+                          text: '一般', 
+                          value: '一般'
+                        }] ,
+                        columnKey: 'projectPrice'
+                    },{
+                      prop: 'projectClassify',
+                      label: '项目分类',
+                      width: 120  
+                    },{
+                      prop: 'customerName',
+                      label: '公司名称(客户)',
+                      width: 120  
+                    },{
+                      prop: 'customerDepartmentName',
+                      label: '部门名称(客户)',
+                      width: 120  
+                    },{
+                      prop: ' lever2Manager',
+                      label: '二级经理(客户)',
+                      width: 120  
+                    }, {
+                      prop: ' lever3Manager',
+                      label: '三级经理(客户)',
+                      width: 120  
+                    }, {
+                      prop: 'customerStaffName',
+                      label: '员工(客户)',
+                      width: 120  
+                    }, {
+                      prop: ' customerPrimaryContact',
+                      label: '项目负责人',
+                      width: 120  
+                    },  
+                    {
+                      prop: 'teams',
+                      label: '涉及小组',
+                      width: 120  
+                    },{
+                      prop: 'involvedRegion',
+                      label: '涉及区域',
+                      width: 120  
+                    },{
+                      prop: 'saleManager',
+                      label: '销售经理',
+                      width: 120  
+                    },{
+                      prop: 'areaProjectManager',
+                      label: '区域大项目经理',
+                      width: 120  
+                    },{
+                      prop: 'regionalSolManager',
+                      label: '区域解决方案经理',
+                      width: 120  
+                    },{
+                      prop: 'projectManagerId',
+                      label: '产品部项目经理',
+                      width: 120  
+                    },{
+                      prop: 'implementManager',
+                      label: '实施经理',
+                      width: 120  
+                    },{
+                      prop: 'developManager',
+                      label: '研发经理',
+                      width: 120  
+                    },{
+                      prop: 'testManager',
+                      label: '测试经理',
+                      width: 120  
+                    },{
+                      prop: 'serviceManager',
+                      label: '服务经理',
+                      width: 120  
+                    },{
+                      prop: 'commerceStatus',
+                      label: '商务状态',
+                      width: 120  
+                    },{
+                      prop: 'implementBases',
+                      label: '实施依据',
+                      width: 120  
+                    },{
+                      prop: 'implementStatus',
+                      label: '实施状态',
+                      width: 120  
+                    },{
+                      prop: 'developStatus',
+                      label: '研发状态',
+                      width: 120  
+                    },{
+                      prop: 'onlineStatus',
+                      label: '上线状态',
+                      width: 120  
+                    },{
+                      prop: 'operateStatus',
+                      label: '交维状态',
+                      width: 120  
+                    },{
+                      prop: 'currentProgress',
+                      label: '当前进展',
+                      width: 120  
+                    },{
+                      prop: 'recentPlan',
+                      label: '近期计划',
+                      width: 120  
+                    },{
+                      prop: 'progress',
+                      label: '进度(%)',
+                      width: 120  
+                    },{
+                      prop: 'pressure',
+                      label: '当前风险度',
+                      width: 120  
+                    },{
+                      prop: 'countermeasures',
+                      label: '当前风险及应对措施',
+                      width: 120  
+                    },{
+                      prop: 'lastMonthWorkTime',
+                      label: '上月工时投入',
+                      width: 120  
+                    },{
+                      prop: 'totalWorkTime',
+                      label: '总工时投入',
+                      width: 120  
+                    },{
+                      prop: 'projectPrice',
+                      label: '下一里程碑',
+                      width: 120  
+                    },{
+                      prop: 'planFinishedTime',
+                      label: '计划完成时间',
+                      width: 160  
+                    },{
+                      prop: 'isOverdue',
+                      label: '里程碑是否逾期',
+                      width: 120  
+                    },{
+                      prop: 'confirmedProgress',
+                      label: '已回款比例',
+                      width: 120  
+                    },{
+                      prop: 'moneyScore',
+                      label: '金融得分',
+                      width: 120  
+                    },{
+                      prop: 'projectPrice',
+                      label: '战略意义得分',
+                      width: 120  
+                    },{
+                      prop: 'projectPrice',
+                      label: '产品匹配度得分',
+                      width: 120  
+                    },{
+                      prop: 'totalScore',
+                      label: '总得分',
+                      width: 120  
+                    },{
+                      status: 'true'
+                    }
+                ],
+                detailVisible: false,
+                newOrderDetail: {},
+                radioTable: '',
+                filter: '',
+                tags: [],
+                column: '',
+                customVisible: false,
+                 pickerOptions2:{
+            onPick:({ maxDate, minDate })=>{
+                 let _maxDate=moment(maxDate).format('YYYY-MM-DD');
+                 let _minDate=moment(minDate).format('YYYY-MM-DD');
+                var result=[];
+                if(maxDate && minDate){
+                this.tempData.forEach(col =>{
+                    if(col[this.column["property"]]>=moment(minDate).format('YYYY-MM-DD') && col[this.column["property"]]<=moment(maxDate).format('YYYY-MM-DD')){
+                        result.push(col);
+                    } 
+                });
+                 this.$refs.mytable.columns.forEach(column=>{
+                    if(column["property"]==this.column["property"]){
+                        column.filteredValue=["10001",_minDate,_maxDate];
+                    }
+                });
+                 this.handleFilterChange();
+
+              }
+            }
+        },
+
             }
         },
         components: {
-           Pagination
+           Pagination,
+           expand,
+            detail,
+            Tab,
+            filterBox,
+            customSetting
         },
-        computed: {
-        // 实时监听表格
-            /*tables: function() {
-                const search = this.search
-                if (search) {
-                    return this.tableData.filter(dataNews => {
-                        return Object.keys(dataNews).some(key => {
-                            return String(dataNews[key]).toLowerCase().indexOf(search) > -1
-                        })
-                    })
-                }
-                return this.tableData
-            }*/
-             tableData1: function() {
-            //  this.tableData = this.tableData.slice((currentPage-1)*pagesize, currentPage*pagesize);
-              console.log("enter");
-              console.log(this);
-              return this.tableData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
-            }
-
-
-
-        },
-		
         created: function() {
-             console.log(this.total);
-           //  let that = this;
-             console.log("2");
+             
              axios.get('/table/list').then((res)=> {
-                 console.log("1")
-             //  that.tableData = res.data.articles
               this.tableData = res.data.articles;
               this.total = res.data.articles.length;
-              // that.total = res.data.articles.length
-               //console.log(this.total);
+              this.tempData = res.data.articles;
+              this.listData = res.data.articles;
+        
          })
         },
        
         methods: {
             // 筛选变色
-            showDate(val) {
+           /* showDate(val) {
                 val = val + '';
                 if (val.indexOf(this.search) !== -1 && this.search !== '') {
                     return val.replace(this.search, '<font color="#409EFF">' + this.search + '</font>')
                 } else {
                     return val
                 }
-            },
+            },*/
             addPage: function () {
-                        this.$router.push({ path: '/addpage'});
+                  this.$router.push({ path: '/addpage'});
 						},
-                          
-                        handleClick(row) {
-                      console.log(row);
-                        },
-                        filterHandler(value, row, column) {
-        const property = column['property'];
-        return row[property] === value;
-      },
-       getSize(val) {
-                this.pagesize = val;
+            handleClick(row) {
+                  console.log(row);
+            },
+            customize() {
+              this.customVisible = true
+            },
+            changeStatus() {
+               this.customVisible = false;
+            },
+            filterHandler(value, row, column) {
+                // const property = column['property'];
+                // return row[property] === value;
+                 return true
+            },
 
-            },
-            getCurrent(val) {
-                this.currentPage = val;
-            },
-                   
+            AutofilterHandler(){
+              let result=[];
+              console.log(this.$refs.mytable)
+              this.$refs.mytable.columns.forEach(column=>{
+               column.filteredValue=[];
+               this.tags.forEach(tag=>{
+                  if(column.property==tag.prop){
+                     if(tag.value=="10001"){
+                          column.filteredValue.push("10001");
+                          column.filteredValue.push(tag.minDate);
+                          column.filteredValue.push(tag.maxDate);
+                      }
+                      else
+                      {
+                        column.filteredValue.push(tag.value);
+                      }
+                  }
+              });
+          }); 
+          this.filterSelect();
+         
+
+
+      },
+      //获取筛选的结果组合
+      handleFilterChange(filters){
+           this.tags=[];
+           this.$refs.mytable.columns.forEach(column=>{
+              if(column.filteredValue && column.filteredValue.length){
+                  if(column.filteredValue[0]=="10001"){
+                     this.tags.push({
+                      "name":column.label+"："+column.filteredValue[1]+"至"+column.filteredValue[2],
+                      "prop":column.property,
+                      "value":"10001",
+                      "minDate":column.filteredValue[1],
+                      "maxDate":column.filteredValue[2]
+                    });
+                  }
+                  else
+                  {
+                   column.filteredValue.forEach(ret=>{
+                      this.tags.push({
+                          "name":column.label+"："+ret,
+                          "prop":column.property,
+                          "value":ret
+                        });
+                   });
+                   console.log(this.tags)
+                  }
+              }
+          });
+           this.filterSelect();
+         
+      
+      },//自定义筛选方法
+      filterSelect(){
        
-       tablePagination(data=[]){
-      /**
-       * 表格数据分页的方法
-       */
-     let array = [], startNum=0, endNum = 0;
-      this.total = data.length;
-      startNum = (this.currentPage-1)*this.pageSize;
-      if(this.currentPage*this.pageSize<this.total){
-          endNum = this.currentPage*this.pageSize;
-      } else {
-          endNum = this.total;
-      }
-      array = data.slice(startNum, endNum);
-      return array;
+        let data=[].concat(JSON.parse(JSON.stringify(this.listData)));
+        let result=[];
+        if(this.tags.length>0){
+          let key = this.tags[0]["prop"];
+          for (var i = 0; i < this.tags.length; i++) {
+            if(this.tags[i]["prop"]!=key){
+              key=this.tags[i]["prop"];
+              data=[].concat(JSON.parse(JSON.stringify(result)));
+              result=[];
+            }
+            if(this.tags[i]["value"]=="10001"){
+               data.forEach(row => {
+                if(row[this.tags[i]["prop"]]>=this.tags[i]["minDate"] && row[this.tags[i]["prop"]]<=this.tags[i]["maxDate"]){
+                  result.push(row);
+                }
+              });
+            }
+            else
+            {
+              data.forEach(row => {
+                if(row[this.tags[i]["prop"]]==this.tags[i]["value"]){
+                  result.push(row);
+                }
+              });
+            }
+          }
+         this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+         console.log(this.tempData)
+        }else{
+          this.tempData=[].concat(JSON.parse(JSON.stringify(this.listData)));
+          console.log(this.tempData)
+         }
+         this.total = this.tempData.length
+         this.currentPage = 1
+         this.pagesize = 10
+         // this.$refs.mytable.store.states.columns.forEach(col => {
+          //    col.order="";
+         // });
+        
+      },
+            getPageSize(val) {
+                this.pagesize = val;
+            },
+            getCurrentPage(val) {
+                this.currentPage = val;
+            }, 
+            getRadioValue(val) {
+             // console.log(val)
+                 this.radio = val;
+            },
+         /*    handleFilterChange(filters){
+              console.log(filters)
+              this.filter = filters;
+              let columnKey = Object.keys(filters).join("");
+              console.log(columnKey)
+              if(columnKey != ''){
+              let data = [].concat(JSON.parse(JSON.stringify(this.listData)))
+              let result = [], arr1=[];
+              for(var i = 0; i < filters[columnKey].length; i++){
+                 var aa = filters[columnKey][i]
+                 arr1[i] = data.filter(dataNews => {
+                        return Object.keys(dataNews).some(key => {
+                          return String(dataNews[key]).toLowerCase().indexOf(aa) > -1
+                })        
+               })
+             }
+             for(var j = 0; j < arr1.length; j++){
+                 for(var k = 0; k < arr1[j].length; k++){
+                     result.push(arr1[j][k])
+                 }
+             }
+             this.tempData = [].concat(JSON.parse(JSON.stringify(result)))
+            // this.total = this.tempData.length
+              console.log("4"+this.tempData)
+              console.log(this.total)
+              }
+              else {
+                  this.tempData = [].concat(JSON.parse(JSON.stringify(this.listData)))
+               this.total = this.tempData.length
+              // console.log(this.total)
+               console.log("5"+this.tempData)
+              }
+            },*/
+            
+             showDetail(index,row){
+               this.newOrderDetail = {
+                   projectalias: row.projectAlias, 
+                   projectid: row.projectId, 
+                   contractno: row.contractNo, 
+                   starttime: row.startTime, 
+                   purchasetype: row.purchaseType, 
+                    };
+               this.detailVisible= !this.detailVisible;
+            },   
+            handleQuit: function(index, row) {
+              //let states = []
+              console.log(row.state)
+              //states.push(row)
+              row.state = !row.state;
+          },
+
+          deleteTagFilter(newTagsArr) {
+        // console.log(newTagsArr);
+            this.AutofilterHandler();
+         },//标记那一列
+        timefilter(column) {
+          this.column = column;
         }
+
+
                    
+        },
+       // computed: {
+           //  tableData2: function() {
+              
+            //  console.log(this.filterHandler())
+              //return this.tableData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
+         // }
+      //  },
+         watch: {
+            radio: function(){
+          
+         // let arr = [], arr1=[]
+          if(this.radio == "unfinished"){
+            console.log(this.radio)
+            let result = [];
+            this.tableData.forEach(row => {
+                if(row["onlineStatus"]!="已结项") {
+                    result.push(row);
+                }
+            });
+            this.tempData = [].concat(JSON.parse(JSON.stringify(result)))
+             this.listData = [].concat(JSON.parse(JSON.stringify(result)))
+             this.$refs.mytable.columns.forEach(column=>{
+                column.filteredValue=[];
+               // column.order="";
+              });
+           this.total =this.tempData.length;
+          
+         //  this.$refs.mytable.clearFilter()
+          
+
+        }else if(this.radio == "finished") {
+          console.log(this.radio)
+            let result=[];
+            this.tableData.forEach(row => {
+               if(row["onlineStatus"]=="已结项"){
+                  result.push(row);
+               }
+            });
+
+            this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+            this.listData=[].concat(JSON.parse(JSON.stringify(result)));
+            console.log(this.$refs.mytable)
+            this.$refs.mytable.columns.forEach(column=>{
+                column.filteredValue=[];
+              //  column.order="";
+              }); 
+          //  this.$refs.mytable.clearFilter()
+             this.total =this.tempData.length;
+             
+           //   console.log("2"+this.tempData)
+        
         }
+       
+        else{
+           
+            this.tempData=[].concat(JSON.parse(JSON.stringify(this.tableData)));
+            this.listData=[].concat(JSON.parse(JSON.stringify(this.tableData)));
+            this.$refs.mytable.columns.forEach(column=>{
+                column.filteredValue=[];
+             //   column.order="";
+              });
+            this.total =this.tempData.length;
+           
+          
+            }
+
+          
+           // this.total =this.tempData.length;
+              console.log(this.tempData.length)
+            //  return this.tempData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
+           
+           },
+
+        },
 
      }
 
 
 </script>
 <style scoped lang="scss">
-.table {
+.content {
    width: 1366px;
    height: 768px;
    min-width: 1366px;
@@ -495,19 +737,40 @@ export default {
    margin: 0 auto;
    text-align: center;
 }
-.info{
-  position: relative;
-  height: 100px;
+.content-header{
+    padding-top: 10px;
+    width: 100%;
+    height: 40px;
+  }
+.content-header-left{
+    float: left;
+    height: 40px;
+    font-size:16px;
+    font-family:PingFangSC-Medium;
+    color:rgba(51,51,51,1);
+    line-height: 40px;
+
+  }
+.content-header-right{
+     height:60px;
+     line-height: 60px;
+     float: right;
+  }
+.table {
+  margin-top: 20px;
 }
-#search{
-   position: absolute;
-   height:auto;
-   right:82px;
-   top:0;
-}
+
+.h-font{
+      color: #999;
+  }
+.h-font:hover{
+    color: #409EFF;
+    cursor:pointer;
+  }
+
 .title{
             width: 173px;
-            /* height: 23px; */
+        
             position: relative;
             top: 21px;
             left: 28px;
@@ -515,20 +778,18 @@ export default {
             font-family: "Microsoft YaHei";
 
 }
- .search{
-         position: relative;
-
- }
- .btn{
-         position: absolute;
-        top: -1px;
-        left: 398px;
- }
+ 
  el-tab td {
      padding: 5px 0 !important;
  }
  
 </style>
+
+<style>
+.cell > .caret-wrapper{
+    visibility: hidden !important;
+}
+</style>  
 
 
 

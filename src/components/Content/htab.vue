@@ -1,30 +1,32 @@
 <template>
- 
-    <el-radio-group v-model="radio3">
-      <el-radio-button label="全部"></el-radio-button>
-      <el-radio-button label="未结项"></el-radio-button>
-      <el-radio-button label="已结项"></el-radio-button>
-      <el-radio-button label="我关注的"></el-radio-button>
+ <div class="htab">
+    <el-radio-group v-model="radio3" @change="changeRadio">
+      <el-radio-button label="all">全部</el-radio-button>
+      <el-radio-button label="unfinished">未结项</el-radio-button>
+      <el-radio-button label="finished">已结项</el-radio-button>
+      <el-radio-button label="attention">我关注的</el-radio-button>
     </el-radio-group>
- <!-- <el-tabs v-model="activeName2" type="card" @tab-click="handleClick">
-    <el-tab-pane label="全部" name="first"></el-tab-pane>
-    <el-tab-pane label="未结项" name="second"></el-tab-pane>
-    <el-tab-pane label="已结项" name="third"></el-tab-pane>
-    <el-tab-pane label="我关注的" name="fourth"></el-tab-pane>
-  </el-tabs>-->
- 
+ </div>
 </template>
 <script>
   export default {
+    props: [
+      'radio'
+    ],
     data() {
       return {
-        radio3: '全部'
+        radio3: 'all'
       };
     },
     methods: {
       handleClick(row) {
-                      console.log(row);
-                        }
+          console.log(row);
+      },
+      changeRadio(val) {
+        this.radio3 = val;
+        console.log(val);
+        this.$emit('changeRadio', val)
+      }
     }
   };
 </script>
