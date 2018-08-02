@@ -26,9 +26,11 @@
 </script>
 <style lang="scss" scoped>
   .detail-wrap ul {
-    max-height: 400px;
-  //  overflow: auto;
-
+    max-height: 500px;
+    font-size: 10px;
+    text-align: left;
+    //overflow: auto;
+    padding-left: 150px;
     li {
      // position: relative;
       padding: 8px;
@@ -43,5 +45,20 @@
         margin-left: 50px;
       }
     }
+  }
+
+  .el-dialog__body {
+    padding: 0px 20px 30px 20px !important;
+  }
+  .el-dialog__header {
+    padding: 10px 0 10px 0 !important;
+  }
+</style>
+<style>
+.el-dialog__body {
+    padding: 0px 20px 30px 20px !important;
+  }
+  .el-dialog__header {
+    padding: 10px 0 10px 0 !important;
   }
 </style>

@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    name: 'filteredBox2',
+    name: 'filteredBox',
     props: ['tagArr'],
     data() {
       return {

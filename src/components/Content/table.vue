@@ -1,33 +1,41 @@
 /* eslint-disabled */
 <template>
  <div class="content">
+   <div class="title">生产调度-项目清单</div>
+   <div style="width: 350px;">
+   <el-input style="padding-left: 1000px" type="search" v-model="search" placeholder="搜索关键字">
+             <el-button slot="append" icon="el-icon-search"></el-button>
+             <el-button type="primary" icon="el-icon-search" @click="searchdata">搜索</el-button>
+           </el-input>
+           </div>
     <div class="content-header">
       <div align="left" class="content-header-left">
          <Tab @changeRadio="getRadioValue"></Tab>
       </div>
       
       <div align="right" class="content-header-right">
-       <span class="h-font" @click="customize">
-          <i class="iconfont el-icon-setting"></i>自定义显示
-        </span> 
+             <span class="h-font" @click="customize">
+               <i class="iconfont el-icon-setting"></i>自定义显示
+             </span>      
       </div>
-    
+     </div>
        <div class="h-tags">
-      <filterBox :tagArr="tags" @deleteTag="deleteTagFilter"></filterBox>
+         <filterBox :tagArr="tags" @deleteTag="deleteTagFilter"></filterBox>
        </div>
-       </div>
-       <div class="table">
+      
+       <!--<div class="table">-->
        <el-table
                 border
                 stripe
                 ref="mytable"
                 fit
                 @filter-change="handleFilterChange"
-                :data="tempData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize)"
+                :data="tempData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                 style="width: 100%"
-                max-height=640
+                max-height=550
                 class="self-table"
-                :default-sort="{prop:'startTime',order: 'descending'}"
+                :default-sort="{prop:'signContractTime',order: 'descending'}"
+                @sort-change="handleSortchange"
                 >
           <el-table-column
             header-align="center"
@@ -89,30 +97,35 @@
                     </template>
                 </el-table-column>     
            </el-table>
-           </div>
+         <!--  </div>-->
            <Pagination
+              ref="myPagination"
               @handleSizeChange="getPageSize"
               @handleCurrentChange="getCurrentPage" 
-              
+              :current-page="currentPage"
+              :page-size="pagesize"
               :total='total'
             >
             </Pagination>
 
             <el-dialog 
             :visible.sync="detailVisible" :modal="true" width="800px">
-          <h2 slot="title">详情</h2>
-          <detail ref="newOrderDetail" :newOrderDetail="newOrderDetail"></detail>
-          <!--<div slot="footer" class="detail-wrap-bottom">
-            <el-button type="text">确认</el-button>
-            <el-button type="text">退回</el-button>
-          </div>-->
-        </el-dialog> 
+              <h2 slot="title">详情</h2>
+              <detail ref="newOrderDetail" :newOrderDetail="newOrderDetail"></detail>
+            </el-dialog> 
 
         <customSetting 
           v-if="customVisible" 
           @changeUserStatus="changeStatus" 
           :defaultKeys="['projectAlias','contractNo','signContractTime','purchaseType']">
-        </customSetting >        
+        </customSetting >
+
+        <Score 
+        v-if="scoreVisible" 
+        @closeScore="closeScore" 
+        :moneyScore="moneyScore" 
+        :id="id">
+        </Score>        
           </div>
 </template>
 <script>
@@ -123,8 +136,9 @@ import Pagination from '@/components/Content/fpagination.vue';
 import expand from '@/components/Content/expand.vue';
 import Tab from '@/components/Content/htab.vue';
 import detail from '@/components/Content/detail.vue';
-import filterBox from './filteredbox.vue';
-import customSetting from './customsetting.vue';
+import filterBox from '@/components/Content/filteredbox.vue';
+import customSetting from '@/components/Content/customsetting.vue';
+import Score from '@/components/Content/scoring.vue';
 import moment from 'moment'
 export default {
         data() {
@@ -138,23 +152,28 @@ export default {
                 pageCount: 0,
                 radio: 'all',
                 columnAll: [
-                    {
+                   {
                       fixed: 'left',
-                      prop: 'projectAlias',
-                      label: '项目通称',
-                      width: 160,
+                      prop: 'projectName',
+                      label: '项目名称',
+                      width: 260  
                     },
                     {
                       prop: 'projectId',
                       label: '商机编号/项目编号',
-                      width: 120  
-                    },{
-                      prop: 'contractNo',
-                      label: '合同编号',
                       width: 160  
                     },{
+                      prop: 'projectAlias',
+                      label: '项目通称',
+                      width: 200,
+                    },
+                    {
+                      prop: 'contractNo',
+                      label: '合同编号',
+                      width: 260  
+                    },{
                       sortable: 'true',
-                      prop: 'startTime',
+                      prop: 'signContractTime',
                       label: '合同签订时间',
                       width: 160 ,
                       render: (h, {column, $index }) => {
@@ -213,10 +232,6 @@ export default {
                             </div>
                           ) 
                       }  
-                    },{
-                      prop: 'projectName',
-                      label: '项目名称',
-                      width: 160  
                     },{
                       prop: 'projectType',
                       label: '项目类型',
@@ -409,29 +424,37 @@ export default {
                 tags: [],
                 column: '',
                 customVisible: false,
-                 pickerOptions2:{
-            onPick:({ maxDate, minDate })=>{
-                 let _maxDate=moment(maxDate).format('YYYY-MM-DD');
-                 let _minDate=moment(minDate).format('YYYY-MM-DD');
-                var result=[];
-                if(maxDate && minDate){
-                this.tempData.forEach(col =>{
-                    if(col[this.column["property"]]>=moment(minDate).format('YYYY-MM-DD') && col[this.column["property"]]<=moment(maxDate).format('YYYY-MM-DD')){
-                        result.push(col);
-                    } 
-                });
-                 this.$refs.mytable.columns.forEach(column=>{
-                    if(column["property"]==this.column["property"]){
-                        column.filteredValue=["10001",_minDate,_maxDate];
+                search: '',
+                pickerOptions2:{
+                    onPick:({ maxDate, minDate })=>{
+                     let _maxDate=moment(maxDate).format('YYYY-MM-DD');
+                     let _minDate=moment(minDate).format('YYYY-MM-DD');
+                     console.log(_maxDate)
+                     console.log(_minDate)
+                     var result=[];
+                     if(maxDate && minDate){
+                       this.tempData.forEach(col =>{
+                         if(col[this.column["property"]]>=moment(minDate).format('YYYY-MM-DD') && col[this.column["property"]]<=moment(maxDate).format('YYYY-MM-DD')){
+                           result.push(col);
+                         } 
+                       });
+                       console.log(result)
+                       this.$refs.mytable.columns.forEach(column=>{
+                         if(column["property"]==this.column["property"]){
+                           column.filteredValue=["10001",_minDate,_maxDate];
+                            console.log(column.filteredValue)
+                         }
+                       });
+                        this.handleFilterChange();
+                     }
                     }
-                });
-                 this.handleFilterChange();
-
-              }
-            }
-        },
-
-            }
+                },
+               isAttention: [],
+               isOldAttention: [],
+               scoreVisible:false,//评分弹窗 
+               moneyScore:'',//评分
+               id:""//标志id
+          }
         },
         components: {
            Pagination,
@@ -439,7 +462,8 @@ export default {
             detail,
             Tab,
             filterBox,
-            customSetting
+            customSetting,
+            Score
         },
         created: function() {
              
@@ -448,20 +472,31 @@ export default {
               this.total = res.data.articles.length;
               this.tempData = res.data.articles;
               this.listData = res.data.articles;
+              for(let item of this.tableData)
+                this.isOldAttention.push(item.state)
+              
+              this.isAttention = [].concat(this.isOldAttention)
         
          })
         },
        
         methods: {
-            // 筛选变色
-           /* showDate(val) {
-                val = val + '';
-                if (val.indexOf(this.search) !== -1 && this.search !== '') {
-                    return val.replace(this.search, '<font color="#409EFF">' + this.search + '</font>')
-                } else {
-                    return val
+          handleScore(index,row){
+             this.scoreVisible=true;
+             this.moneyScore=row.moneyScore;
+             this.id=row.id;
+          },
+           searchdata: function() {
+                const search = this.search
+                if (search) {
+                    return this.tableData.filter(dataNews => {
+                        return Object.keys(dataNews).some(key => {
+                            return String(dataNews[key]).toLowerCase().indexOf(search) > -1
+                        })
+                    })
                 }
-            },*/
+                return this.tempData
+            },
             addPage: function () {
                   this.$router.push({ path: '/addpage'});
 						},
@@ -474,14 +509,18 @@ export default {
             changeStatus() {
                this.customVisible = false;
             },
+
+            //关闭评分
+            closeScore(){
+              this.scoreVisible = false;
+            },
             filterHandler(value, row, column) {
                 // const property = column['property'];
                 // return row[property] === value;
                  return true
             },
 
-            AutofilterHandler(){
-              let result=[];
+            AutofilterHandler(){     
               console.log(this.$refs.mytable)
               this.$refs.mytable.columns.forEach(column=>{
                column.filteredValue=[];
@@ -505,7 +544,7 @@ export default {
 
       },
       //获取筛选的结果组合
-      handleFilterChange(filters){
+      handleFilterChange(){
            this.tags=[];
            this.$refs.mytable.columns.forEach(column=>{
               if(column.filteredValue && column.filteredValue.length){
@@ -575,87 +614,118 @@ export default {
          // this.$refs.mytable.store.states.columns.forEach(col => {
           //    col.order="";
          // });
-        
       },
-            getPageSize(val) {
-                this.pagesize = val;
-            },
-            getCurrentPage(val) {
-                this.currentPage = val;
-            }, 
-            getRadioValue(val) {
-             // console.log(val)
-                 this.radio = val;
-            },
-         /*    handleFilterChange(filters){
-              console.log(filters)
-              this.filter = filters;
-              let columnKey = Object.keys(filters).join("");
-              console.log(columnKey)
-              if(columnKey != ''){
-              let data = [].concat(JSON.parse(JSON.stringify(this.listData)))
-              let result = [], arr1=[];
-              for(var i = 0; i < filters[columnKey].length; i++){
-                 var aa = filters[columnKey][i]
-                 arr1[i] = data.filter(dataNews => {
-                        return Object.keys(dataNews).some(key => {
-                          return String(dataNews[key]).toLowerCase().indexOf(aa) > -1
-                })        
-               })
-             }
-             for(var j = 0; j < arr1.length; j++){
-                 for(var k = 0; k < arr1[j].length; k++){
-                     result.push(arr1[j][k])
-                 }
-             }
-             this.tempData = [].concat(JSON.parse(JSON.stringify(result)))
-            // this.total = this.tempData.length
-              console.log("4"+this.tempData)
-              console.log(this.total)
-              }
-              else {
-                  this.tempData = [].concat(JSON.parse(JSON.stringify(this.listData)))
-               this.total = this.tempData.length
-              // console.log(this.total)
-               console.log("5"+this.tempData)
-              }
-            },*/
-            
-             showDetail(index,row){
-               this.newOrderDetail = {
-                   projectalias: row.projectAlias, 
-                   projectid: row.projectId, 
-                   contractno: row.contractNo, 
-                   starttime: row.startTime, 
-                   purchasetype: row.purchaseType, 
-                    };
-               this.detailVisible= !this.detailVisible;
-            },   
-            handleQuit: function(index, row) {
-              //let states = []
-              console.log(row.state)
-              //states.push(row)
-              row.state = !row.state;
-          },
 
-          deleteTagFilter(newTagsArr) {
-        // console.log(newTagsArr);
+      //排序改变时触发事件handleSortchange({})
+      handleSortchange({ column, prop, order }){
+          // console.log(order);
+          // console.log(this.$refs.mytable.store.states.columns);
+          // this.listLoading=true;
+          // setTimeout(() => {
+          this.$refs.mytable.store.states.columns.forEach(col => {
+              col.order="";
+              if(col.property==prop){
+                  col.order=order;
+              }
+          });
+          let result=[].concat(JSON.parse(JSON.stringify(this.tempData)));
+          if(order=="ascending"){
+              let tmp="";
+              for (var i = 0; i < result.length-1; i++) {
+                for (var j = result.length-1; j >i; j--) {
+                    if(result[j][prop]<result[j-1][prop]){
+                        tmp=result[j]
+                        result[j]=result[j-1];
+                        result[j-1]=tmp;
+                    }
+                }
+              }
+              this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+              this.pageBegin();
+          }else if(order=="descending"){
+               let tmp="";
+              for (var i = 0; i < result.length-1; i++) {
+                for (var j = result.length-1; j >i; j--) {
+                    if(result[j][prop]>result[j-1][prop]){
+                        tmp=result[j]
+                        result[j]=result[j-1];
+                        result[j-1]=tmp;
+                    }
+                }
+              }
+              this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+              this.pageBegin();
+          }
+          //  this.listLoading=false;
+          // }, 1000);
+      },
+
+
+
+      getPageSize(val) {
+          this.pagesize = val;
+      },
+      getCurrentPage(val) {
+          this.currentPage = val;
+      }, 
+      getRadioValue(val) {
+             // console.log(val)
+         this.radio = val;
+      },
+      showDetail(index,row){
+        this.newOrderDetail = {
+              projectalias: row.projectAlias, 
+              projectid: row.projectId, 
+              contractno: row.contractNo, 
+              starttime: row.startTime, 
+              purchasetype: row.purchaseType, 
+              };
+        this.detailVisible= !this.detailVisible;
+      },   
+      handleQuit: function(index, row) {
+          for(var i = 0; i < this.isAttention.length; i++){
+                if(i == index){
+                   var a = this.isAttention[row["id"]]
+                   this.isAttention[row["id"]] = !a
+                  //console.log(!row.state)
+                }
+          }
+              //console.log(this.isAttention)
+          row.state = !row.state;
+      },
+
+      deleteTagFilter(newTagsArr) {
+            console.log(newTagsArr);
             this.AutofilterHandler();
-         },//标记那一列
-        timefilter(column) {
+      },
+      //标记那一列
+      timefilter(column) {
           this.column = column;
-        }
+      },
+      pageBegin() {
+          this.pagesize = 10;
+          this.currentPage = 1;
+          this.$refs.myPagination.currentpage = 1
+      }
 
 
                    
         },
-       // computed: {
-           //  tableData2: function() {
+        computed: {
+            // tableData2: function() {
               
-            //  console.log(this.filterHandler())
-              //return this.tableData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
+           //   console.log(this.filterHandler())
+           //   return this.tableData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
          // }
-      //  },
+       /*  isAttention: function() {
+            let arr = []
+            for(let item of this.tableData){
+                this.arr.push(item.state)
+              }
+              return arr
+         }*/
+       },
+
          watch: {
             radio: function(){
           
@@ -672,10 +742,14 @@ export default {
              this.listData = [].concat(JSON.parse(JSON.stringify(result)))
              this.$refs.mytable.columns.forEach(column=>{
                 column.filteredValue=[];
+                
                // column.order="";
               });
+              this.isAttention = [].concat(this.isOldAttention);
+              console.log(this.isAttention)
            this.total =this.tempData.length;
-          
+          this.pageBegin()
+          console.log(this.currentPage)
          //  this.$refs.mytable.clearFilter()
           
 
@@ -694,15 +768,35 @@ export default {
             this.$refs.mytable.columns.forEach(column=>{
                 column.filteredValue=[];
               //  column.order="";
-              }); 
+              });
+                this.isAttention = [].concat(this.isOldAttention);
+                 console.log(this.isAttention)
+                    console.log(this.isOldAttention)
           //  this.$refs.mytable.clearFilter()
              this.total =this.tempData.length;
-             
+             this.pageBegin()
            //   console.log("2"+this.tempData)
         
         }
        
-        else{
+        else if(this.radio == "attention") {
+    
+              let i = 0
+              let result=[];
+              this.tableData.forEach(row => {
+                row["state"] = this.isAttention[i]
+                if(row["state"] == false){
+                   result.push(row);
+
+                }
+                i++
+              });
+           this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+           this.total =this.tempData.length;
+           this.pageBegin()
+        }
+        
+        else {
            
             this.tempData=[].concat(JSON.parse(JSON.stringify(this.tableData)));
             this.listData=[].concat(JSON.parse(JSON.stringify(this.tableData)));
@@ -710,8 +804,11 @@ export default {
                 column.filteredValue=[];
              //   column.order="";
               });
+               this.isAttention = [].concat(this.isOldAttention);
+                console.log(this.isAttention)
+                console.log(this.isOldAttention)
             this.total =this.tempData.length;
-           
+           this.pageBegin()
           
             }
 
@@ -736,29 +833,35 @@ export default {
    min-height: 768px;
    margin: 0 auto;
    text-align: center;
-}
-.content-header{
-    padding-top: 10px;
-    width: 100%;
-    height: 40px;
+   .content-header{
+      padding-top: 10px;
+      width: 100%;
+      height: 40px;
+      .content-header-left{
+         float: left;
+         height: 40px;
+         font-size:16px;
+         font-family:PingFangSC-Medium;
+         color:rgba(51,51,51,1);
+         line-height: 40px;
+      }
+      .content-header-right{
+         height:60px;
+         line-height: 60px;
+         font-size: 16px;
+         float: right;
+      }
+     
+    }
+    .h-tags{
+      padding-top: 20px;
+      padding-bottom: 20px;
   }
-.content-header-left{
-    float: left;
-    height: 40px;
-    font-size:16px;
-    font-family:PingFangSC-Medium;
-    color:rgba(51,51,51,1);
-    line-height: 40px;
+    .table {
+       margin-top: 80px;
+    }
 
   }
-.content-header-right{
-     height:60px;
-     line-height: 60px;
-     float: right;
-  }
-.table {
-  margin-top: 20px;
-}
 
 .h-font{
       color: #999;
@@ -770,7 +873,6 @@ export default {
 
 .title{
             width: 173px;
-        
             position: relative;
             top: 21px;
             left: 28px;
@@ -778,7 +880,7 @@ export default {
             font-family: "Microsoft YaHei";
 
 }
- 
+
  el-tab td {
      padding: 5px 0 !important;
  }
@@ -787,7 +889,11 @@ export default {
 
 <style>
 .cell > .caret-wrapper{
-    visibility: hidden !important;
+    display: none !important;
+}
+
+.el-table th {
+  overflow: visible !important;
 }
 </style>  
 
