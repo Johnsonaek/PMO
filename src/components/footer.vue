@@ -3,12 +3,12 @@
         <p class="footer-href">友情链接</p>
         <p class="footer-href-bottom"></p>
         <div class="footer-top-wrapper">
-            <div class="footer-div">
+            <div class="footer-div" style="font-size: 12px">
                 <p>dop能力开发平台</p>
                 <p>BI套件</p>
                 <p>大数据AI开放平台</p>
             </div>
-            <div class="footer-div" style="font-size: 12px">
+            <div class="footer-div" style="font-size: 10px">
                 <p style="padding-bottom: 10px"><i class="el-icon-location"></i>
                     公司地址：苏州高新区科技城昆仑山路58号
                 </p>
@@ -19,7 +19,7 @@
                     电话：4001-10086-5
                 </p>
             </div>
-            <div class="footer-div" style="border-right:none;">
+            <div class="footer-div" style="border-right:none; font-size: 12px">
                 <ul>
                     <li><p>关于我们</p></li>
                     <li><p>专利认证</p></li>
@@ -46,6 +46,7 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
     .footer {
+        line-height: 1.2 !important;
         background-color: #66b1ff;
         padding: 15px 30px 0 30px;
         color: #fff;
@@ -55,6 +56,7 @@
         .footer-href {
             text-align: left;
             margin: 0 0 0px 60px;
+            font-size: 12px;
         }
         .footer-href-bottom {
             margin: 0 0 0 60px;
@@ -66,7 +68,7 @@
             display: flex;
             margin-left: 20px;
             border-bottom: 1px solid #fff;
-            padding-bottom: 15px; 
+            padding-bottom: 10px; 
             .footer-div {
                 flex: 35%;
                 padding: 0 40px;

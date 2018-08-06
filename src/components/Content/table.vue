@@ -1,29 +1,31 @@
 /* eslint-disabled */
 <template>
- <div class="content">
-   <div class="title">生产调度-项目清单</div>
-   <div style="width: 350px;">
-   <el-input style="padding-left: 1000px" type="search" v-model="search" placeholder="搜索关键字">
-             <el-button slot="append" icon="el-icon-search"></el-button>
-             <el-button type="primary" icon="el-icon-search" @click="searchdata">搜索</el-button>
-           </el-input>
-           </div>
-    <div class="content-header">
-      <div align="left" class="content-header-left">
+ <div class="pmo-content">
+   <div class="pmo-content-header">
+     <div class="pmo-content-header-left">生产调度-项目清单</div>
+     <div class="pmo-content-header-right">
+        <el-input class="h-input" type="search" v-model="search" placeholder="搜索关键字">
+             <el-button slot="append" icon="el-icon-search" @click="searchdata"></el-button>
+            <!-- <el-button type="primary" icon="el-icon-search" @click="searchdata">搜索</el-button>-->
+        </el-input>
+    </div>
+   </div>
+   <div class="pmo-tab">
+      <div class="pmo-content-header-left">
          <Tab @changeRadio="getRadioValue"></Tab>
       </div>
       
-      <div align="right" class="content-header-right">
+      <div class="pmo-content-header-right">
              <span class="h-font" @click="customize">
                <i class="iconfont el-icon-setting"></i>自定义显示
              </span>      
       </div>
      </div>
-       <div class="h-tags">
+       <div class="pmo-tags">
          <filterBox :tagArr="tags" @deleteTag="deleteTagFilter"></filterBox>
        </div>
       
-       <!--<div class="table">-->
+      <div class="table">
        <el-table
                 border
                 stripe
@@ -32,9 +34,8 @@
                 @filter-change="handleFilterChange"
                 :data="tempData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                 style="width: 100%"
-                max-height=550
+                max-height=450
                 class="self-table"
-                :default-sort="{prop:'signContractTime',order: 'descending'}"
                 @sort-change="handleSortchange"
                 >
           <el-table-column
@@ -97,7 +98,7 @@
                     </template>
                 </el-table-column>     
            </el-table>
-         <!--  </div>-->
+         
            <Pagination
               ref="myPagination"
               @handleSizeChange="getPageSize"
@@ -107,7 +108,7 @@
               :total='total'
             >
             </Pagination>
-
+         </div>
             <el-dialog 
             :visible.sync="detailVisible" :modal="true" width="800px">
               <h2 slot="title">详情</h2>
@@ -143,15 +144,16 @@ import moment from 'moment'
 export default {
         data() {
             return {
-                tableData: [],
-                tempData: [],
-                listData: [],
-                total: 0,
-                pagesize: 10,
+                tableData: [],  //存放原始数据
+                tempData: [],   //存放经过删选的数据
+                listData: [],   //存放tab切换的数据
+                total: 0,       //记录数量统计，分页total
+                pagesize: 10,   
                 currentPage: 1,
-                pageCount: 0,
-                radio: 'all',
-                columnAll: [
+               // pageCount: 0,
+                radio: 'all',   //tab值
+               // radioTable: '',
+                columnAll: [    //column属性值
                    {
                       fixed: 'left',
                       prop: 'projectName',
@@ -172,7 +174,7 @@ export default {
                       label: '合同编号',
                       width: 260  
                     },{
-                      sortable: 'true',
+                    //  sortable: 'true',
                       prop: 'signContractTime',
                       label: '合同签订时间',
                       width: 160 ,
@@ -181,11 +183,12 @@ export default {
                              <div class="sort-table-header-wrapper">
                                 <span style="float: left">{column.label}</span>
                                 <span class="caret-wrapper">
-                                  <i class="sort-caret ascending"></i>
-                                  <i class="sort-caret descending"></i>
+                                  <i class="sort-caret ascending" on-click={() => this.handleSortchange({column:column, prop:column.property, order:'ascending'})}></i>
+                                  <i class="sort-caret descending" on-click={() => this.handleSortchange({column:column, prop:column.property, order:'descending'})}></i>
                                 </span>
                                 <span class="el-table_column-filter-trigger" on-click={() => this.timefilter(column)}>
                                  <el-date-picker
+                                 unlink-panels={true}
                                  type="daterange"
                                  picker-options={this.pickerOptions2}
                                 style="width: 1px; border: none">
@@ -224,6 +227,7 @@ export default {
                              <span style="float: left">{column.label}</span>
                                 <span class="el-table_column-filter-trigger" on-click={() => this.timefilter(column)}>
                                  <el-date-picker
+                                 unlink-panels={true}
                                  type="daterange"
                                  picker-options={this.pickerOptions2}
                                 style="width: 1px; border: none">
@@ -235,7 +239,22 @@ export default {
                     },{
                       prop: 'projectType',
                       label: '项目类型',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'projectType',
+                      filters: [
+                        {
+                           text:'集团产品研发类',
+                           value:'集团产品研发类'
+                        },{
+                           text:'集团委托应用研发类',
+                           value:'集团委托应用研发类'
+                        },{
+                           text:'市场类（内部）',
+                           value:'市场类（内部）'
+                        },{
+                            text:'市场类（外部）',
+                            value:'市场类（外部）'
+                        }] 
                     },{
                       prop: 'startTime',
                       label: '项目启动时间',
@@ -247,7 +266,8 @@ export default {
                     },{
                       prop: 'projectLevel',
                       label: '项目级别',
-                      width: 120 ,
+                      width: 120,
+                      columnKey: 'projectLevel',
                       filters: [
                         {
                           text: '重大',
@@ -263,7 +283,28 @@ export default {
                     },{
                       prop: 'projectClassify',
                       label: '项目分类',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'projectClassify',
+                      filters: [
+                        {
+                          text:'产品销售',
+                          value:'产品销售'
+                        },{
+                          text:'软件开发服务',
+                          value:'软件开发服务'
+                        },{
+                          text:'资源服务',
+                          value:'资源服务'
+                        },{
+                          text:'咨询服务',
+                          value:'咨询服务'
+                        },{
+                          text:'集成服务',
+                          value:'集成服务'
+                        },{
+                          text:'支撑服务',
+                          value:'支撑服务'
+                        }]  
                     },{
                       prop: 'customerName',
                       label: '公司名称(客户)',
@@ -296,7 +337,22 @@ export default {
                     },{
                       prop: 'involvedRegion',
                       label: '涉及区域',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'involvedRegion',
+                      filters: [
+                        {
+                          text:'北支',
+                          value:'北支'
+                        },{
+                          text:'上支',
+                          value:'上支'
+                        },{
+                          text:'成支',
+                          value:'成支'
+                        },{
+                          text:'广支',
+                          value:'广支'
+                        }]  
                     },{
                       prop: 'saleManager',
                       label: '销售经理',
@@ -332,27 +388,128 @@ export default {
                     },{
                       prop: 'commerceStatus',
                       label: '商务状态',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'commerceStatus',
+                      filters: [
+                        {
+                          text:'商机中',
+                          value:'商机中'
+                        },{
+                          text:'已立项',
+                          value:'已立项'
+                        },{
+                          text:'已谈判',
+                          value:'已谈判'
+                        },{
+                          text:'已签约',
+                          value:'已签约'
+                        },{
+                          text:'已结项',
+                          value:'已结项'
+                        }]  
                     },{
                       prop: 'implementBases',
                       label: '实施依据',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'implementBases',
+                      filters: [
+                        {
+                          text:'无',
+                          value:'无'
+                        },{
+                          text:'POC',
+                          value:'POC'
+                        },{
+                          text:'合同',
+                          value:'合同'
+                        },{
+                          text:'POC+合同',
+                          value:'POC+合同'
+                        }]  
                     },{
                       prop: 'implementStatus',
                       label: '实施状态',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'implementStatus',
+                      filters: [
+                        {
+                          text:'未实施',
+                          value:'未实施'
+                        },{
+                          text:'实施中',
+                          value:'实施中'
+                        },{
+                          text:'已完成',
+                          value:'已完成'
+                        }]  
                     },{
                       prop: 'developStatus',
                       label: '研发状态',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'developStatus',
+                      filters: [
+                        {
+                          text:'未开发',
+                          value:'未开发'
+                        },{
+                          text:'开发中',
+                          value:'开发中'
+                        },{
+                          text:'已完成',
+                          value:'已完成'
+                        }]  
                     },{
                       prop: 'onlineStatus',
                       label: '上线状态',
-                      width: 120  
+                      width: 120,
+                      columnKey: 'onlineStatus',
+                      filters: [
+                        {
+                          text:'未上线',
+                          value:'未上线'
+                        },{
+                          text:'预上线',
+                          value:'预上线'
+                        },{
+                          text:'正式上线',
+                          value:'正式上线'
+                        }]  
                     },{
                       prop: 'operateStatus',
                       label: '交维状态',
+                      width: 120,
+                      columnKey: 'operateStatus',
+                      filters: [
+                        {
+                          text:'未交维',
+                          value:'未交维'
+                        },{
+                          text:'自运维',
+                          value:'自运维'
+                        },{
+                          text:'已交维'
+                          ,value:'已交维'
+                        }]  
+                    },{
+                      prop: 'progress',
+                      label: '进度(%)',
                       width: 120  
+                    },{
+                      prop: 'pressure',
+                      label: '当前风险度',
+                      width: 120,
+                      columnKey: 'pressure',
+                      filters: [
+                        {
+                          text:'高',
+                          value:'高'
+                        },{
+                          text:'中',
+                          value:'中'
+                        },{
+                          text:'低',
+                          value:'低'
+                        }]  
                     },{
                       prop: 'currentProgress',
                       label: '当前进展',
@@ -362,24 +519,8 @@ export default {
                       label: '近期计划',
                       width: 120  
                     },{
-                      prop: 'progress',
-                      label: '进度(%)',
-                      width: 120  
-                    },{
-                      prop: 'pressure',
-                      label: '当前风险度',
-                      width: 120  
-                    },{
                       prop: 'countermeasures',
                       label: '当前风险及应对措施',
-                      width: 120  
-                    },{
-                      prop: 'lastMonthWorkTime',
-                      label: '上月工时投入',
-                      width: 120  
-                    },{
-                      prop: 'totalWorkTime',
-                      label: '总工时投入',
                       width: 120  
                     },{
                       prop: 'projectPrice',
@@ -398,6 +539,14 @@ export default {
                       label: '已回款比例',
                       width: 120  
                     },{
+                      prop: 'totalWorkTime',
+                      label: '总工时投入',
+                      width: 120  
+                    },{
+                      prop: 'lastMonthWorkTime',
+                      label: '上月工时投入',
+                      width: 120  
+                    },{
                       prop: 'moneyScore',
                       label: '金融得分',
                       width: 120  
@@ -411,26 +560,26 @@ export default {
                       width: 120  
                     },{
                       prop: 'totalScore',
-                      label: '总得分',
+                      label: '项目评分',
                       width: 120  
                     },{
                       status: 'true'
                     }
                 ],
-                detailVisible: false,
-                newOrderDetail: {},
-                radioTable: '',
-                filter: '',
-                tags: [],
-                column: '',
-                customVisible: false,
-                search: '',
+                detailVisible: false,   //详情弹窗
+                newOrderDetail: {},      //详情信息展示
+               
+              //  filter: '',        
+                tags: [],     //存放筛选信息并展示
+                column: '',    //标识列
+                customVisible: false,  //自定义设置弹窗
+                search: '',    
                 pickerOptions2:{
                     onPick:({ maxDate, minDate })=>{
                      let _maxDate=moment(maxDate).format('YYYY-MM-DD');
                      let _minDate=moment(minDate).format('YYYY-MM-DD');
-                     console.log(_maxDate)
-                     console.log(_minDate)
+                    // console.log(_maxDate)
+                    // console.log(_minDate)
                      var result=[];
                      if(maxDate && minDate){
                        this.tempData.forEach(col =>{
@@ -438,35 +587,35 @@ export default {
                            result.push(col);
                          } 
                        });
-                       console.log(result)
+                    //   console.log(result)
                        this.$refs.mytable.columns.forEach(column=>{
                          if(column["property"]==this.column["property"]){
                            column.filteredValue=["10001",_minDate,_maxDate];
-                            console.log(column.filteredValue)
+                           // console.log(column.filteredValue)
                          }
                        });
                         this.handleFilterChange();
                      }
                     }
                 },
-               isAttention: [],
-               isOldAttention: [],
-               scoreVisible:false,//评分弹窗 
-               moneyScore:'',//评分
-               id:""//标志id
+                isAttention: [],   //存放改变后state的值
+                isOldAttention: [], //存放原始state的值
+                scoreVisible:false, //评分弹窗 
+                moneyScore:'', //评分
+                id:"", //标志id,
+               
           }
         },
         components: {
-           Pagination,
-           expand,
+            Pagination,
+            expand,
             detail,
             Tab,
             filterBox,
             customSetting,
             Score
         },
-        created: function() {
-             
+        created: function() {   
              axios.get('/table/list').then((res)=> {
               this.tableData = res.data.articles;
               this.total = res.data.articles.length;
@@ -486,15 +635,17 @@ export default {
              this.moneyScore=row.moneyScore;
              this.id=row.id;
           },
-           searchdata: function() {
+          searchdata() {
                 const search = this.search
                 if (search) {
-                    return this.tableData.filter(dataNews => {
+                    this.tempData = this.listData.filter(dataNews => {
                         return Object.keys(dataNews).some(key => {
                             return String(dataNews[key]).toLowerCase().indexOf(search) > -1
                         })
                     })
                 }
+                this.total = this.tempData.length;
+                this.pageBegin()
                 return this.tempData
             },
             addPage: function () {
@@ -536,17 +687,14 @@ export default {
                         column.filteredValue.push(tag.value);
                       }
                   }
-              });
-          }); 
-          this.filterSelect();
-         
-
-
-      },
-      //获取筛选的结果组合
-      handleFilterChange(){
-           this.tags=[];
-           this.$refs.mytable.columns.forEach(column=>{
+                });
+              }); 
+              this.filterSelect();
+            },
+        //获取筛选的结果组合
+          handleFilterChange(){
+            this.tags=[];
+            this.$refs.mytable.columns.forEach(column=>{
               if(column.filteredValue && column.filteredValue.length){
                   if(column.filteredValue[0]=="10001"){
                      this.tags.push({
@@ -569,63 +717,67 @@ export default {
                    console.log(this.tags)
                   }
               }
-          });
-           this.filterSelect();
+            });
+             this.filterSelect();
          
       
-      },//自定义筛选方法
-      filterSelect(){
+          },
+          //自定义筛选方法
+          filterSelect(){
        
-        let data=[].concat(JSON.parse(JSON.stringify(this.listData)));
-        let result=[];
-        if(this.tags.length>0){
-          let key = this.tags[0]["prop"];
-          for (var i = 0; i < this.tags.length; i++) {
-            if(this.tags[i]["prop"]!=key){
-              key=this.tags[i]["prop"];
-              data=[].concat(JSON.parse(JSON.stringify(result)));
-              result=[];
-            }
-            if(this.tags[i]["value"]=="10001"){
-               data.forEach(row => {
-                if(row[this.tags[i]["prop"]]>=this.tags[i]["minDate"] && row[this.tags[i]["prop"]]<=this.tags[i]["maxDate"]){
-                  result.push(row);
+             let data=[].concat(JSON.parse(JSON.stringify(this.listData)));
+             let result=[];
+             if(this.tags.length>0){
+              let key = this.tags[0]["prop"];
+               for (var i = 0; i < this.tags.length; i++) {
+                if(this.tags[i]["prop"]!=key){
+                  key=this.tags[i]["prop"];
+                  data=[].concat(JSON.parse(JSON.stringify(result)));
+                  result=[];
+                 }
+                if(this.tags[i]["value"]=="10001"){
+                  data.forEach(row => {
+                   if(row[this.tags[i]["prop"]]>=this.tags[i]["minDate"] && row[this.tags[i]["prop"]]<=this.tags[i]["maxDate"]){
+                     result.push(row);
+                   }
+                  });
                 }
-              });
-            }
-            else
-            {
-              data.forEach(row => {
-                if(row[this.tags[i]["prop"]]==this.tags[i]["value"]){
-                  result.push(row);
+                else
+                {
+                 data.forEach(row => {
+                  if(row[this.tags[i]["prop"]]==this.tags[i]["value"]){
+                    result.push(row);
+                   }
+                 });
                 }
-              });
-            }
-          }
-         this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
-         console.log(this.tempData)
-        }else{
-          this.tempData=[].concat(JSON.parse(JSON.stringify(this.listData)));
-          console.log(this.tempData)
-         }
-         this.total = this.tempData.length
-         this.currentPage = 1
-         this.pagesize = 10
-         // this.$refs.mytable.store.states.columns.forEach(col => {
-          //    col.order="";
-         // });
+               }   
+               this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+       //  console.log(this.tempData)
+              }else{
+                this.tempData=[].concat(JSON.parse(JSON.stringify(this.listData)));
+       //   console.log(this.tempData)
+              }
+              this.total = this.tempData.length;
+               this.pageBegin();
+            
+              this.$refs.mytable.store.states.columns.forEach(col => {
+              col.order="";
+          });
       },
 
       //排序改变时触发事件handleSortchange({})
-      handleSortchange({ column, prop, order }){
-          // console.log(order);
-          // console.log(this.$refs.mytable.store.states.columns);
+      handleSortchange( {column, prop, order} ){
+      // console.log(order);
+       //    console.log(column)
+       //   console.log(prop)
+        //   console.log(this.$refs.mytable.store.states.columns);
           // this.listLoading=true;
           // setTimeout(() => {
           this.$refs.mytable.store.states.columns.forEach(col => {
               col.order="";
               if(col.property==prop){
                   col.order=order;
+                 
               }
           });
           let result=[].concat(JSON.parse(JSON.stringify(this.tempData)));
@@ -640,6 +792,7 @@ export default {
                     }
                 }
               }
+             // console.log("ascending")
               this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
               this.pageBegin();
           }else if(order=="descending"){
@@ -653,6 +806,7 @@ export default {
                     }
                 }
               }
+           //   console.log("descending")
               this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
               this.pageBegin();
           }
@@ -701,6 +855,7 @@ export default {
       //标记那一列
       timefilter(column) {
           this.column = column;
+          console.log(column)
       },
       pageBegin() {
           this.pagesize = 10;
@@ -712,18 +867,18 @@ export default {
                    
         },
         computed: {
-            // tableData2: function() {
-              
-           //   console.log(this.filterHandler())
-           //   return this.tableData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
-         // }
-       /*  isAttention: function() {
-            let arr = []
-            for(let item of this.tableData){
-                this.arr.push(item.state)
-              }
-              return arr
-         }*/
+          /* searchdata: function() {
+              //this.tempData = this.tableData;
+               const search = this.search;
+               if (search) {
+                 return this.tempData.filter(dataNews => {
+                   return Object.keys(dataNews).some(key => {
+                    return (String(dataNews[key]).toLowerCase().indexOf(search) > -1);
+                  });
+                });
+               }
+             return this.tempData;
+           }*/
        },
 
          watch: {
@@ -731,10 +886,10 @@ export default {
           
          // let arr = [], arr1=[]
           if(this.radio == "unfinished"){
-            console.log(this.radio)
+          //  console.log(this.radio)
             let result = [];
             this.tableData.forEach(row => {
-                if(row["onlineStatus"]!="已结项") {
+                if(row["commerceStatus"]!="已结项") {
                     result.push(row);
                 }
             });
@@ -742,14 +897,13 @@ export default {
              this.listData = [].concat(JSON.parse(JSON.stringify(result)))
              this.$refs.mytable.columns.forEach(column=>{
                 column.filteredValue=[];
-                
                // column.order="";
               });
               this.isAttention = [].concat(this.isOldAttention);
-              console.log(this.isAttention)
+              //console.log(this.isAttention)
            this.total =this.tempData.length;
           this.pageBegin()
-          console.log(this.currentPage)
+         // console.log(this.currentPage)
          //  this.$refs.mytable.clearFilter()
           
 
@@ -757,7 +911,7 @@ export default {
           console.log(this.radio)
             let result=[];
             this.tableData.forEach(row => {
-               if(row["onlineStatus"]=="已结项"){
+               if(row["commerceStatus"]=="已结项"){
                   result.push(row);
                }
             });
@@ -770,8 +924,8 @@ export default {
               //  column.order="";
               });
                 this.isAttention = [].concat(this.isOldAttention);
-                 console.log(this.isAttention)
-                    console.log(this.isOldAttention)
+                // console.log(this.isAttention)
+                 //   console.log(this.isOldAttention)
           //  this.$refs.mytable.clearFilter()
              this.total =this.tempData.length;
              this.pageBegin()
@@ -792,6 +946,11 @@ export default {
                 i++
               });
            this.tempData=[].concat(JSON.parse(JSON.stringify(result)));
+           this.listData=[].concat(JSON.parse(JSON.stringify(result)));
+           this.$refs.mytable.columns.forEach(column=>{
+                column.filteredValue=[];
+             //   column.order="";
+              });
            this.total =this.tempData.length;
            this.pageBegin()
         }
@@ -802,19 +961,19 @@ export default {
             this.listData=[].concat(JSON.parse(JSON.stringify(this.tableData)));
             this.$refs.mytable.columns.forEach(column=>{
                 column.filteredValue=[];
-             //   column.order="";
+              //  column.order="";
               });
                this.isAttention = [].concat(this.isOldAttention);
-                console.log(this.isAttention)
-                console.log(this.isOldAttention)
+               // console.log(this.isAttention)
+               // console.log(this.isOldAttention)
             this.total =this.tempData.length;
-           this.pageBegin()
+            this.pageBegin()
           
             }
 
           
            // this.total =this.tempData.length;
-              console.log(this.tempData.length)
+             // console.log(this.tempData.length)
             //  return this.tempData.slice((this.currentPage-1)*this.pagesize,this.currentPage*this.pagesize);
            
            },
@@ -826,43 +985,50 @@ export default {
 
 </script>
 <style scoped lang="scss">
-.content {
+.pmo-content {
+   padding: 0px 50px;
    width: 1366px;
    height: 768px;
    min-width: 1366px;
    min-height: 768px;
    margin: 0 auto;
    text-align: center;
-   .content-header{
+   .pmo-content-header{
       padding-top: 10px;
       width: 100%;
-      height: 40px;
-      .content-header-left{
+      height: 60px; 
+    }
+    .pmo-tab {
+      // padding-top: 20px;
+       height: 60px;
+       border-bottom: 1px solid #EEE;
+    }
+    .pmo-tags{
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .table {
+     //  margin-top: 10px;
+       margin-bottom: 10px;
+       width: 100%;
+       min-height: 100px;
+    }
+
+  }
+    .pmo-content-header-left{
          float: left;
-         height: 40px;
+         height: 60px;
          font-size:16px;
          font-family:PingFangSC-Medium;
          color:rgba(51,51,51,1);
-         line-height: 40px;
+         line-height: 60px;
       }
-      .content-header-right{
+      .pmo-content-header-right{
          height:60px;
          line-height: 60px;
          font-size: 16px;
          float: right;
       }
-     
-    }
-    .h-tags{
-      padding-top: 20px;
-      padding-bottom: 20px;
-  }
-    .table {
-       margin-top: 80px;
-    }
-
-  }
-
 .h-font{
       color: #999;
   }
@@ -870,16 +1036,9 @@ export default {
     color: #409EFF;
     cursor:pointer;
   }
-
-.title{
-            width: 173px;
-            position: relative;
-            top: 21px;
-            left: 28px;
-            font-size: 20px;
-            font-family: "Microsoft YaHei";
-
-}
+ .h-input{
+    width: 300px;
+ }
 
  el-tab td {
      padding: 5px 0 !important;

@@ -2,14 +2,15 @@
     <div class="pmo-header">
         <el-menu
                 :default-active="activeIndex"
-                class="iap-el-menu"
+                class="pmo-el-menu"
                 :router=true
                 mode="horizontal"
                 background-color="#66b1ff"
                 text-color="#fff"
-                active-text-color="#000">
+                active-text-color="#000"
+                 @select="handleSelect">
             <el-menu-item index="/">
-                <span class="iap-submenu-title">PMO管理系统</span>
+                <span class="pmo-submenu-title">PMO管理系统</span>
             </el-menu-item>
             <el-submenu index="1" id="menu">
                 <template slot="title">机器管理</template>
@@ -23,7 +24,7 @@
             </el-submenu>
             <el-submenu index="3">
                 <template slot="title">生产调度</template>
-                        <el-menu-item index="3-1">项目清单</el-menu-item>
+                        <el-menu-item index="/home">项目清单</el-menu-item>
                         <el-menu-item index="3-2">项目变更</el-menu-item>
             </el-submenu>
             <el-submenu index="4">
@@ -53,51 +54,22 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
     .pmo-header {
-       .iap-submenu-title {
+        min-width: 1200px;
+       .pmo-submenu-title {
             padding-right: 50px;
             font-size: 20px;
         }
     }
 
-    .iap-submenu-header {
-        display: block;
-        width: 175px;
-        margin: 0px 20px 0px 20px;
-        padding: 10px 0;
-        color: #fff;
-    }
-    .el-menu--popup {
-        padding: 0 !important;
-    }
 
-    .el-menu--popup-bottom-start {
-        .el-menu-item {
-           // width: 175px;
-            padding-left: 20px !important;
-            color: #000 !important;
-            background-color:#fff !important;
-        }
-    }
-
-    #app .el-menu--horizontal, body > .el-menu--horizontal {
-        border: none !important;
-    }
-
+    .pmo-el-menu {
+     padding-left: 30px;
+     }
+    
     .el-menu--horizontal {
-        border: none !important;
+        border-bottom: 0;
     }
 
-    #app .el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
-        background-color: #66b1ff !important;
-        color: #fff !important;
-    }
 
-    .el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
-        color: #66b1ff !important;
-    }
-
-    .el-menu--horizontal>.el-submenu .el-submenu__title:hover {
-        background-color: #66b1ff !important;
-    }
 </style>
 

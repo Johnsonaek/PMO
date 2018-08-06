@@ -1,7 +1,7 @@
 <template>
   <div>
   <!--   <el-button type="text" @click="dialogFormVisible = true">打开嵌套表单的 Dialog</el-button> -->
-    <el-dialog title="评分(Hcontrol大数据运维平台)" :visible.sync="dialogFormVisible" :before-close="close" class='scoring'>
+    <el-dialog title="评分" :visible.sync="dialogFormVisible" :before-close="close" class='scoring'>
       <el-form :model='form'  ref="form">
            <el-form-item label="金额得分:" :label-width="formLabelWidth" class="money">
     		     <span>{{form.moneyScore}}</span>

@@ -20,7 +20,7 @@
         </el-tree>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary">保存</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
         <el-button @click="close">关闭</el-button>
       </span>
     </el-dialog> 
@@ -56,15 +56,16 @@ import util from '@/utils/util.js';
         this.changeUserStatus();
         this.dialogVisible = false;
       },
-    // save() {
+      save() {
         /*获取被选中节点的key组成的数组（true表示叶子节点）*/
-      /*  let keyArr = this.$refs.tree.getCheckedKeys(true);
-        setUserDefined({userDefine: keyArr}).then(res => {
-          console.log(res);
+         let keyArr = this.$refs.tree.getCheckedKeys(true);
+         console.log(keyArr)
+        //  axios.post('/data/test.php',{userDefine: keyArr}).then(res => {
+        //  console.log(res);
           this.changeUserStatus();
-        });
-        this.dialogVisible = false;
-    },*/
+      //  });
+         this.dialogVisible = false;
+    },
       changeUserStatus() {
         this.$emit('changeUserStatus', false);
       }
